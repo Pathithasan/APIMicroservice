@@ -5,11 +5,11 @@ namespace ProductMicroServices.Services
 {
     public interface IProductService
     {
-        IEnumerable<Product> GetAllProducts();
-        Product GetByProductyId(int productId);
-        void InsertProduct(Product product);
-        void UpdateProduct(Product product);
-        void DeleteProduct(int productId);
+        Task<IEnumerable<Product>> GetAllProducts();
+        Task<Product> GetByProductyId(int productId);
+        Task InsertProduct(Product product);
+        Task UpdateProduct(Product product);
+        Task DeleteProduct(int productId);
     }
 }
 

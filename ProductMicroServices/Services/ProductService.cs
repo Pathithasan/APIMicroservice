@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore;
 using NuGet.Protocol.Core.Types;
 using ProductMicroServices.DAL;
 using ProductMicroServices.Models;
@@ -8,44 +9,71 @@ namespace ProductMicroServices.Services
     public class ProductService : IProductService
     {
         private IGenericRepository<Product> _repository;
+
         public ProductService(IGenericRepository <Product> repository)
         {
             _repository = repository;
         }
 
-        public void DeleteProduct(int productId)
+        
+        /// <summary>
+        /// Get a collection of all products
+        /// </summary>
+        /// <returns>A return of all products</returns>
+        public async Task<IEnumerable<Product>> GetAllProducts()
         {
-            _repository.Delete(productId);
-            _repository.Save();
+            return (from prd in await _repository.GetAll()
+                    orderby prd.Name
+                    select prd);
         }
 
-        public IEnumerable<Product> GetAllProducts()
+        /// <summary>
+        /// Gets a prduct by ID
+        /// </summary>
+        /// <param name="productId">The ID of product to retrive</param>
+        /// <returns></returns>
+        public async Task<Product> GetByProductyId(int productId)
         {
-            
-            return _repository.GetAll();
-        }
-
-        public Product GetByProductyId(int productId)
-        {
-            return _repository.GetById(productId);
+            return await _repository.GetById(productId);
             
         }
 
         /// <summary>
-        /// 
+        /// Insert the product entity
         /// </summary>
-        /// <param name="product"></param>
-        public void InsertProduct(Product product)
+        /// <param name="product">The product to add</param>
+        public async Task InsertProduct(Product product)
         {
-            _repository.Insert(product);
-            _repository.Save();
+            if (product != null)
+            {
+                await _repository.Insert(product);
+            }  
         }
 
-        void IProductService.UpdateProduct(Product product)
+        /// <summary>
+        /// Modify the product,  If exist
+        /// </summary>
+        /// <param name="product"></param>
+        /// <returns></returns>
+        public async Task UpdateProduct(Product product)
         {
-            _repository.Update(product);
-            _repository.Save();
+            if (product != null)
+            {
+                await _repository.Update(product);
+            }     
         }
+
+        /// <summary>
+        /// Delete the product by ID
+        /// </summary>
+        /// <param name="productId">The Id of product to delete</param>
+        /// <returns></returns>
+        public async Task DeleteProduct(int productId)
+        {
+            await _repository.Delete(productId);
+        }
+
+        
     }
 }
 

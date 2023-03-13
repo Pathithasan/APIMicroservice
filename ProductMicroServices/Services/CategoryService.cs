@@ -13,36 +13,59 @@ namespace ProductMicroServices.Services
             _repository = repository;
         }
 
-        public void DeleteCategory(int categoryId)
-        {
-            _repository.Delete(categoryId);
-            _repository.Save();
-        }
-
-        public IEnumerable<Category> GetAllCategories()
-        {
-            //return _repository.GetAll();
-            return (from cat in _repository.GetAll()
+        /// <summary>
+        /// Get a collection of all categories
+        /// </summary>
+        /// <returns>A return of all categories</returns>
+        public async Task<IEnumerable<Category>> GetAllCategories()
+        { 
+            return (from cat in await _repository.GetAll()
                     orderby cat.Name
                     select cat);
         }
 
-        public Category GetByCategoryId(int categoryId)
+        /// <summary>
+        /// Gets a prduct by ID
+        /// </summary>
+        /// <param name="categoryId">The ID of category to retrive</param>
+        /// <returns></returns>
+        public async Task<Category> GetByCategoryId(int categoryId)
         {
-            return _repository.GetById(categoryId);
+            return await _repository.GetById(categoryId);
         }
 
-        public void InsertCategory(Category category)
+        /// <summary>
+        /// Insert the category entity
+        /// </summary>
+        /// <param name="category">The category to add</param>
+        public async Task InsertCategory(Category category)
         {
-            _repository.Insert(category);
-            //_repository.Save();
+            await _repository.Insert(category);
+            
         }
 
-        public void UpdateCategory(Category category)
+        /// <summary>
+        /// Modify the category,  If exist
+        /// </summary>
+        /// <param name="category"></param>
+        /// <returns></returns>
+        public async Task UpdateCategory(Category category)
         {
-            _repository.Update(category);
-            _repository.Save();
+            await _repository.Update(category);
+           
         }
+
+        /// <summary>
+        /// Delete the category by ID
+        /// </summary>
+        /// <param name="categoryId">The Id of category to delete</param>
+        /// <returns></returns>
+        public async Task DeleteCategory(int categoryId)
+        {
+            await _repository.Delete(categoryId);
+
+        }
+
     }
 }
 

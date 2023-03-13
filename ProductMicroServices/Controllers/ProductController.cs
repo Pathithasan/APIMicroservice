@@ -22,42 +22,63 @@ namespace ProductMicroServices.Controllers
             _productService = productService;
             _categoryService = categoryService;
         }
-       
-        // GET: api/values
+
+        /// <summary>
+        /// Get a collection of all products
+        /// </summary>
+        /// <returns>A return of all products</returns>
         [HttpGet]
-        public IActionResult GetAll()
-        //public IEnumerable<Product> GetAll()
+        public async Task<IActionResult> GetAll()
         {
-           
-            var products = _productService.GetAllProducts();
-            var pro = (from pr in _productService.GetAllProducts()
-                       join cat in _categoryService.GetAllCategories()
-                        on pr.CategoryId equals cat.Id
-                        select new ViewModel.ProductVM
-                        {
-                            Id= pr.Id,
-                            Name= pr.Name,
-                            Description= pr.Description,
-                            Price= pr.Price,
-                            CategoryName= cat.Name
-                            
-                        }).ToList();
-            return new OkObjectResult(pro);
+            var categories = await _categoryService.GetAllCategories();
+            if (categories.Count() > 0)
+            {
+                var products = await _productService.GetAllProducts();
+                if (products.Count() > 0)
+                {
+                    var pro = (from product in products
+                               join category in categories
+
+                                on product.CategoryId equals category.Id
+                               select new ViewModel.ProductVM
+                               {
+                                   Id = product.Id,
+                                   Name = product.Name,
+                                   Description = product.Description,
+                                   Price = product.Price,
+                                   CategoryName = category.Name
+
+                               }).ToList();
+                    return new OkObjectResult(pro);
+                }
+                else
+                {
+                    //return NotFound();
+                    return new OkObjectResult("Product not found");
+                }
+            }
+            else
+            {
+                return new OkObjectResult("Category not found");
+            }   
             
         }
 
         /// <summary>
-        /// 
+        /// Gets a prduct by ID
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">The ID of product to retrive</param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public IActionResult GetByID(int id)
+        public async Task<IActionResult> GetByID(int id)
         {
-            return new OkObjectResult(_productService.GetByProductyId(id));
+            return new OkObjectResult(await _productService.GetByProductyId(id));
         }
 
-        
+        /// <summary>
+        /// Insert the product entity
+        /// </summary>
+        /// <param name="product">The product to add</param>
         [HttpPost]
         public IActionResult Create([FromBody] Product product)
         {
@@ -72,19 +93,19 @@ namespace ProductMicroServices.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Modify the product,  If exist
         /// </summary>
         /// <param name="id"></param>
         /// <param name="product"></param>
         /// <returns></returns>
         [HttpPut("{id}")]
-        public IActionResult Update(int id, [FromBody] Product product)
+        public async Task<IActionResult> Update(int id, [FromBody] Product product)
         {
             if (product != null)
             {
                 using (var scope = new TransactionScope())
                 {
-                    _productService.UpdateProduct(product);
+                    await _productService.UpdateProduct(product);
                     scope.Complete();
                     return new OkResult();
                 }
@@ -93,14 +114,14 @@ namespace ProductMicroServices.Controllers
         }
 
         /// <summary>
-        /// 
+        /// Delete the product by ID
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="id">The Id of product to delete</param>
         /// <returns></returns>
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            _productService.DeleteProduct(id);
+            await _productService.DeleteProduct(id);
             return new OkResult();
         }
     }

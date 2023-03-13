@@ -5,11 +5,11 @@ namespace ProductMicroServices.Services
 {
     public interface ICategoryService
     {
-        IEnumerable<Category> GetAllCategories();
-        Category GetByCategoryId(int categorytId);
-        void InsertCategory(Category category );
-        void UpdateCategory(Category category);
-        void DeleteCategory(int categoryID);
+        Task<IEnumerable<Category>> GetAllCategories();
+        Task<Category> GetByCategoryId(int categorytId);
+        Task InsertCategory(Category category );
+        Task UpdateCategory(Category category);
+        Task DeleteCategory(int categoryID);
     }
 }
 
